@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.tomel_weather_app">
    <application
-        android:label="tomel_weather_app"
+        android:label="Tomel Weather"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
