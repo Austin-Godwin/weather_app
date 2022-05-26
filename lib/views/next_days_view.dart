@@ -1,9 +1,25 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'components/weather_speed.dart';
 
 class NextDaysView extends StatelessWidget {
-  const NextDaysView({Key? key}) : super(key: key);
+  // final String tomorrow;
+  // final String tomorrowMinTemperature;
+  // final String tomorrowMaxTemperature;
+  // final String tomorroeDescription;
+  // final String speedType;
+  // final String humidityType;
+  // final String pressureType;
+  // final String speed;
+  // final String humidity;
+  // final String pressure;
+  // final String day;
+  // final String description;
+  // final String minTemperature;
+  // final String maxTemperature;
+  final List<Map<String, dynamic>> list;
+  const NextDaysView({Key? key, required this.list}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +50,7 @@ class NextDaysView extends StatelessWidget {
                     iconSize: 20.0,
                   ),
                   const Text(
-                    "Next Days",
+                    "Next 7 Days",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
@@ -120,10 +136,10 @@ class NextDaysView extends StatelessWidget {
                                 ),
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: const [
+                                  children: [
                                     Text(
-                                      "25",
-                                      style: TextStyle(
+                                      "${((list[1]["temp"]["min"]) - 273).truncate()}",
+                                      style: const TextStyle(
                                         fontSize: 80,
                                         color: Colors.white,
                                         // fontWeight: FontWeight.bold,
@@ -136,8 +152,8 @@ class NextDaysView extends StatelessWidget {
                                       ),
                                     ),
                                     Text(
-                                      "/27°",
-                                      style: TextStyle(
+                                      "/${((list[1]["temp"]["max"]) - 273).truncate()}°",
+                                      style: const TextStyle(
                                         fontSize: 40,
                                         color: Colors.white,
                                         // fontWeight: FontWeight.bold,
@@ -151,9 +167,9 @@ class NextDaysView extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                const Text(
-                                  "Rain - cloudy",
-                                  style: TextStyle(
+                                Text(
+                                  "${list[1]["weather"][0]["description"]}",
+                                  style: const TextStyle(
                                     fontSize: 20,
                                     color: Colors.white,
                                     // fontWeight: FontWeight.bold,
@@ -177,7 +193,7 @@ class NextDaysView extends StatelessWidget {
                         width: MediaQuery.of(context).size.width,
                         margin: const EdgeInsets.symmetric(horizontal: 30),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 15.0, vertical: 20),
+                            horizontal: 5.0, vertical: 10),
                         decoration: BoxDecoration(
                             color: Colors.grey.withOpacity(0.2),
                             // Color(0xFF000000).withOpacity(0.6),
@@ -185,24 +201,25 @@ class NextDaysView extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: const [
+                          children: [
                             WeatherSpeed(
-                              basicUnit: "50",
-                              type: "type",
-                              icon: Icons.accessibility_new_sharp,
+                              icon: Icons.speed_rounded,
+                              basicUnit: "${list[1]["speed"]}km/h",
+                              type: "speed",
                             ),
                             // SizedBox(
                             //   width: 40,
                             // ),
                             WeatherSpeed(
-                              basicUnit: "68",
-                              type: "type",
-                              icon: Icons.abc_sharp,
+                              icon: Icons.percent_rounded,
+                              basicUnit: "${list[1]["humidity"]}%",
+                              type: "humidity",
                             ),
                             WeatherSpeed(
-                              basicUnit: "30",
-                              type: "type",
-                              icon: Icons.accessible_forward_rounded,
+                              icon: Icons.bar_chart_rounded,
+                              basicUnit:
+                                  "${((list[1]["pressure"]) / 1013 * 763).truncate()}mmhg",
+                              type: "pressure",
                             ),
                           ],
                         ),
@@ -211,7 +228,7 @@ class NextDaysView extends StatelessWidget {
                         height: 20.0,
                       ),
                       ...List.generate(
-                        7,
+                        list.length,
                         ((index) => Container(
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 30),
@@ -231,25 +248,49 @@ class NextDaysView extends StatelessWidget {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text(
-                                      "Mon",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.white,
-                                        // fontWeight: FontWeight.bold,
-                                        // shadows: [
-                                        //   Shadow(
-                                        //     offset: Offset(2, 2),
-                                        //   )
-                                        // ]
-                                        // Color(0xFF636364).withOpacity(0.9),
-                                      ),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          DateFormat("EEEE").format(DateTime
+                                              .fromMillisecondsSinceEpoch(
+                                                  list[index]["dt"] * 1000)),
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            color: Colors.white,
+                                            // fontWeight: FontWeight.bold,
+                                            // shadows: [
+                                            //   Shadow(
+                                            //     offset: Offset(2, 2),
+                                            //   )
+                                            // ]
+                                            // Color(0xFF636364).withOpacity(0.9),
+                                          ),
+                                        ),
+                                        Text(
+                                          DateFormat("MMM, dd yyyy").format(
+                                              DateTime
+                                                  .fromMillisecondsSinceEpoch(
+                                                      list[index]["dt"] *
+                                                          1000)),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                            // fontWeight: FontWeight.bold,
+                                            // shadows: [
+                                            //   Shadow(
+                                            //     offset: Offset(2, 2),
+                                            //   )
+                                            // ]
+                                            // Color(0xFF636364).withOpacity(0.9),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     Container(
                                       // height: 40,
                                       // width: 40,
                                       // decoration: BoxDecoration(),
-                                      child: Row(
+                                      child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           SizedBox(
@@ -261,9 +302,9 @@ class NextDaysView extends StatelessWidget {
                                           const SizedBox(
                                             width: 10.0,
                                           ),
-                                          const Text(
-                                            "Rainy",
-                                            style: TextStyle(
+                                          Text(
+                                            "${list[index]["weather"][0]["description"]}",
+                                            style: const TextStyle(
                                               fontSize: 20,
                                               color: Colors.white,
                                               // fontWeight: FontWeight.bold,
@@ -278,9 +319,9 @@ class NextDaysView extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                    const Text(
-                                      "17/15",
-                                      style: TextStyle(
+                                    Text(
+                                      "${((list[index]["temp"]["min"]) - 273).truncate()}/${((list[index]["temp"]["max"]) - 273).truncate()}°",
+                                      style: const TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
                                         // fontWeight: FontWeight.bold,

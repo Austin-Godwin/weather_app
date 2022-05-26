@@ -5,6 +5,8 @@ import 'package:tomel_weather_app/utils/all_methods.dart';
 import 'package:tomel_weather_app/views/components/weather_card.dart';
 import 'package:tomel_weather_app/views/components/weather_speed.dart';
 
+import '../services/weather_service.dart';
+
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
 
@@ -13,25 +15,71 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  final AllMethods _methods = AllMethods();
-  // bool isLoading = false;
+  // final AllMethods _methods = AllMethods();
+  TextEditingController citySearchController = TextEditingController();
+  int selectedIndex = 0;
+  bool isLoading = false;
+  final WeatherService _weatherService = WeatherService();
+
+  Map<String, dynamic> weatherData = {};
+  List<Map<String, dynamic>> weatherDataTime = [];
+  List<Map<String, dynamic>> weatherDataDays = [];
+  final String defaultcity = "lagos";
+
+  getCurrentWeather(String? city) async {
+    // print("I'm here");
+    setState(() {
+      isLoading = true;
+    });
+    weatherData =
+        await _weatherService.getCurrentWeather(city: city ??= defaultcity);
+    // print("======Weather Data========");
+    // print(weatherData);
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  getCurrentWeatherTime(String? city) async {
+    setState(() {
+      isLoading = true;
+    });
+    // print("I'm here");
+    weatherDataTime =
+        await _weatherService.getCurrentWeatherTime(city: city ??= defaultcity);
+    // print("======Weather Data Time========");
+    // print(weatherDataTime);
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  getWeatherDays(String? city) async {
+    setState(() {
+      isLoading = true;
+    });
+    // print("I'm here");
+    weatherDataDays =
+        await _weatherService.getWeatherDays(city: city ??= defaultcity);
+    // print("======Weather Data Time========");
+    // print(weatherDataDays);
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  toSetState() {
+    getCurrentWeather(citySearchController.text);
+    getCurrentWeatherTime(citySearchController.text);
+    getWeatherDays(citySearchController.text);
+  }
 
   @override
   void initState() {
-    // setState(() {
-    //   isLoading = true;
-    // });
     Future.delayed(
       const Duration(seconds: 2),
-      () {
-        _methods.getCurrentWeather();
-        _methods.getCurrentWeatherTime();
-      },
+      () => toSetState(),
     );
-    // _methods.getCurrentWeather();
-    // print("========Init State========");
-    // print(_methods.weatherData);
-    setState(() {});
     super.initState();
   }
 
@@ -41,7 +89,9 @@ class _HomeViewState extends State<HomeView> {
       backgroundColor: const Color(0xFF343434),
       // backgroundColor: Color(0xFFF0E7FE),
       body: SafeArea(
-        child: _methods.weatherData.isEmpty
+        child: weatherData.isEmpty ||
+                weatherDataTime.isEmpty ||
+                weatherDataDays.isEmpty
             ? const Center(
                 child: CircularProgressIndicator(),
               )
@@ -56,7 +106,7 @@ class _HomeViewState extends State<HomeView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          _methods.weatherData["name"],
+                          weatherData["name"],
                           // "San Fransisco",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
@@ -95,6 +145,7 @@ class _HomeViewState extends State<HomeView> {
                                           // ],
                                         ),
                                         child: TextFormField(
+                                          controller: citySearchController,
                                           style: const TextStyle(
                                               color: Colors.white),
                                           decoration: const InputDecoration(
@@ -105,7 +156,17 @@ class _HomeViewState extends State<HomeView> {
                                       ),
                                       actions: [
                                         TextButton(
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            setState(() {
+                                              Navigator.pop(context);
+                                              getCurrentWeather(
+                                                  citySearchController.text);
+                                              getCurrentWeatherTime(
+                                                  citySearchController.text);
+                                              getWeatherDays(
+                                                  citySearchController.text);
+                                            });
+                                          },
                                           child: const Text(
                                             "SEARCH",
                                             style: TextStyle(
@@ -186,7 +247,7 @@ class _HomeViewState extends State<HomeView> {
                               child: Text(
                                 DateFormat("EEEE, MMMM dd, yyyy").format(
                                     DateTime.fromMillisecondsSinceEpoch(
-                                        _methods.weatherData["dt"] * 1000)),
+                                        weatherData["dt"] * 1000)),
                                 // "Monday, May 27, 2022",
                                 style: const TextStyle(
                                     fontSize: 20.0,
@@ -213,8 +274,7 @@ class _HomeViewState extends State<HomeView> {
                                 Positioned(
                                   top: 30,
                                   child: Text(
-                                    _methods.weatherData["weather"][0]
-                                        ["description"],
+                                    weatherData["weather"][0]["description"],
                                     // "Thunder Storm",
                                     style: const TextStyle(
                                         fontSize: 30,
@@ -232,7 +292,7 @@ class _HomeViewState extends State<HomeView> {
                                 Positioned(
                                   bottom: 40,
                                   child: Text(
-                                    "${(_methods.weatherData["main"]["temp"] - 273).truncate()}°",
+                                    "${(weatherData["main"]["temp"] - 273).truncate()}°",
                                     // "38°",
                                     style: const TextStyle(
                                         fontSize: 100,
@@ -268,23 +328,24 @@ class _HomeViewState extends State<HomeView> {
                                   WeatherSpeed(
                                       icon: Icons.speed_rounded,
                                       basicUnit:
-                                          "${(_methods.weatherData["wind"]["speed"])}km/h",
+                                          "${(weatherData["wind"]["speed"])}km/h",
                                       type: "Speed"),
                                   WeatherSpeed(
                                       icon: Icons.percent_rounded,
                                       basicUnit:
-                                          "${(_methods.weatherData["main"]["humidity"])}%",
+                                          "${(weatherData["main"]["humidity"])}%",
                                       type: "humidity"),
                                   WeatherSpeed(
                                       icon: Icons.bar_chart_rounded,
                                       basicUnit:
-                                          "${((_methods.weatherData["main"]["pressure"]) / 1013 * 760).truncate()}mmhg",
+                                          "${((weatherData["main"]["pressure"]) / 1013 * 760).truncate()}mmhg",
                                       type: "pressure"),
                                 ],
                               ),
                             ),
                             WeatherCards(
-                              list: _methods.weatherDataTime,
+                              timeList: weatherDataTime,
+                              daysList: weatherDataDays,
                             ),
                           ],
                         ),

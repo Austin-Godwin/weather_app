@@ -4,8 +4,15 @@ import 'package:tomel_weather_app/views/components/time_card.dart';
 import 'package:tomel_weather_app/views/next_days_view.dart';
 
 class WeatherCards extends StatelessWidget {
-  final List<Map<String, dynamic>> list;
-  const WeatherCards({Key? key, required this.list}) : super(key: key);
+  final List<Map<String, dynamic>> timeList;
+  final List<Map<String, dynamic>> daysList;
+  // final Function()? onTap;
+  const WeatherCards({
+    Key? key,
+    required this.timeList,
+    required this.daysList,
+    // required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +54,9 @@ class WeatherCards extends StatelessWidget {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const NextDaysView()));
+                            builder: (context) => NextDaysView(
+                                  list: daysList,
+                                )));
                   }),
                   child: Row(
                     children: const [
@@ -83,13 +92,14 @@ class WeatherCards extends StatelessWidget {
                 //   width: 15.0,
                 // ),
                 ...List.generate(
-                    (list.length / 5).floor(),
+                    (timeList.length / 5).floor(),
                     (index) => TimeCard(
+                        // onTap: onTap,
                         temperature:
-                            "${((list[index]["main"]["temp"]) - 273).truncate()}°",
+                            "${((timeList[index]["main"]["temp"]) - 273).truncate()}°",
                         time: DateFormat("h:mm a").format(
                             DateTime.fromMillisecondsSinceEpoch(
-                                list[index]["dt"] * 1000)))),
+                                timeList[index]["dt"] * 1000)))),
                 // const SizedBox(
                 //   width: 30.0,
                 // ),
