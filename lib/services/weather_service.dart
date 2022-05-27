@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:tomel_weather_app/constant/api.dart';
 
 class WeatherService {
-  Future<Map<String, dynamic>> getCurrentWeather({String? city}) async {
+  Future<Map<String, dynamic>> getCurrentWeather({required String city}) async {
     try {
       http.Response response = await http.get(
         Uri.parse("${Api.baseUrl}/weather?q=$city"),
@@ -14,7 +14,7 @@ class WeatherService {
       );
       // print("========Response Body=======");
       // print(response.body);
-      final data = jsonDecode(response.body);
+      var data = jsonDecode(response.body);
       // print("========Data=======");
       // print(data);
       // List weatherResult = await data.map((e) => e[""]);
@@ -25,7 +25,7 @@ class WeatherService {
   }
 
   Future<List<Map<String, dynamic>>> getCurrentWeatherTime(
-      {String? city}) async {
+      {required String city}) async {
     try {
       http.Response response = await http.get(
         Uri.parse("${Api.baseUrl}/forecast?q=$city"),
@@ -34,23 +34,24 @@ class WeatherService {
           Api.apiKey: Api.apiKeyValue,
         },
       );
-      print("========Response Body=======");
-      print(response.body);
-      final data = jsonDecode(response.body)["list"];
-      print("========Data=======");
-      print(data);
+      // print("========Response Body=======");
+      // print(response.body);
+      var data = jsonDecode(response.body)["list"];
+      // print("========Data=======");
+      // print(data);
       final List<Map<String, dynamic>> result =
           List<Map<String, dynamic>>.from(data.map((e) => e));
-      print("========Result=======");
-      print(result);
+      // print("========Result=======");
+      // print(result);
       return result;
     } catch (e) {
-      print("I am $e");
+      // print("The error is: $e");
       rethrow;
     }
   }
 
-  Future<List<Map<String, dynamic>>> getWeatherDays({String? city}) async {
+  Future<List<Map<String, dynamic>>> getWeatherDays(
+      {required String city}) async {
     try {
       http.Response response = await http.get(
         Uri.parse("${Api.baseUrl}/forecast/daily?q=$city"),
@@ -59,11 +60,17 @@ class WeatherService {
           Api.apiKey: Api.apiKeyValue,
         },
       );
-      final data = jsonDecode(response.body)["list"];
+      // print(response.body);
+      var data = jsonDecode(response.body)["list"];
+      // print("========Data=======");
+      print(data);
       final List<Map<String, dynamic>> result =
           List<Map<String, dynamic>>.from(data.map((e) => e));
+      // print("========Result=======");
+      // print(result);
       return result;
     } catch (e) {
+      // print("The error is: $e");
       rethrow;
     }
   }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class WeatherSpeed extends StatelessWidget {
+class SpeedHumidityPressureCard extends StatelessWidget {
   final IconData icon;
   final String basicUnit;
   final String type;
-  const WeatherSpeed({
+  const SpeedHumidityPressureCard({
     Key? key,
     required this.icon,
     required this.basicUnit,

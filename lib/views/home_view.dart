@@ -1,11 +1,13 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tomel_weather_app/constant/colors.dart';
 import 'package:tomel_weather_app/utils/all_methods.dart';
+import 'package:tomel_weather_app/views/components/current_day.dart';
+import 'package:tomel_weather_app/views/components/current_weather_details.dart';
+import 'package:tomel_weather_app/views/components/search_dialog.dart';
+import 'package:tomel_weather_app/views/components/speed_pressure_humidity_container.dart';
 import 'package:tomel_weather_app/views/components/weather_card.dart';
-import 'package:tomel_weather_app/views/components/weather_speed.dart';
-
-import '../services/weather_service.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key? key}) : super(key: key);
@@ -15,70 +17,36 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  // final AllMethods _methods = AllMethods();
+  final AllMethods _methods = AllMethods();
   TextEditingController citySearchController = TextEditingController();
-  int selectedIndex = 0;
-  bool isLoading = false;
-  final WeatherService _weatherService = WeatherService();
 
-  Map<String, dynamic> weatherData = {};
-  List<Map<String, dynamic>> weatherDataTime = [];
-  List<Map<String, dynamic>> weatherDataDays = [];
-  final String defaultcity = "lagos";
-
-  getCurrentWeather(String? city) async {
-    // print("I'm here");
-    setState(() {
-      isLoading = true;
-    });
-    weatherData =
-        await _weatherService.getCurrentWeather(city: city ??= defaultcity);
-    // print("======Weather Data========");
-    // print(weatherData);
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  getCurrentWeatherTime(String? city) async {
-    setState(() {
-      isLoading = true;
-    });
-    // print("I'm here");
-    weatherDataTime =
-        await _weatherService.getCurrentWeatherTime(city: city ??= defaultcity);
-    // print("======Weather Data Time========");
-    // print(weatherDataTime);
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  getWeatherDays(String? city) async {
-    setState(() {
-      isLoading = true;
-    });
-    // print("I'm here");
-    weatherDataDays =
-        await _weatherService.getWeatherDays(city: city ??= defaultcity);
-    // print("======Weather Data Time========");
-    // print(weatherDataDays);
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  toSetState() {
-    getCurrentWeather(citySearchController.text);
-    getCurrentWeatherTime(citySearchController.text);
-    getWeatherDays(citySearchController.text);
+  @override
+  void dispose() {
+    citySearchController.dispose();
+    super.dispose();
   }
 
   @override
   void initState() {
     Future.delayed(
       const Duration(seconds: 2),
-      () => toSetState(),
+      () {
+        _methods.getCurrentWeather(
+            city: citySearchController.text,
+            toSetState: () {
+              setState(() {});
+            });
+        _methods.getCurrentWeatherTime(
+            city: citySearchController.text,
+            toSetState: () {
+              setState(() {});
+            });
+        _methods.getWeatherDays(
+            city: citySearchController.text,
+            toSetState: () {
+              setState(() {});
+            });
+      },
     );
     super.initState();
   }
@@ -89,9 +57,9 @@ class _HomeViewState extends State<HomeView> {
       backgroundColor: const Color(0xFF343434),
       // backgroundColor: Color(0xFFF0E7FE),
       body: SafeArea(
-        child: weatherData.isEmpty ||
-                weatherDataTime.isEmpty ||
-                weatherDataDays.isEmpty
+        child: _methods.weatherData.isEmpty ||
+                _methods.weatherDataTime.isEmpty ||
+                _methods.weatherDataDays.isEmpty
             ? const Center(
                 child: CircularProgressIndicator(),
               )
@@ -105,22 +73,32 @@ class _HomeViewState extends State<HomeView> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          weatherData["name"],
-                          // "San Fransisco",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30,
-                            color: Colors.white,
-                            shadows: [
-                              Shadow(
-                                offset: Offset(2, 2),
-                              )
-                            ],
-                            // Color(0xFF4B4B4C),
-                          ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              size: 30,
+                              color: Colors.white,
+                            ),
+                            Text(
+                              _methods.weatherData["name"],
+                              // "San Fransisco",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 30,
+                                color: Colors.white,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(2, 2),
+                                  )
+                                ],
+                                // Color(0xFF4B4B4C),
+                              ),
+                            ),
+                          ],
                         ),
-                        // const Spacer(),
+
+                        ///Displays a dialog for user to search for city location
                         IconButton(
                           onPressed: () async {
                             return showDialog(
@@ -159,12 +137,25 @@ class _HomeViewState extends State<HomeView> {
                                           onPressed: () {
                                             setState(() {
                                               Navigator.pop(context);
-                                              getCurrentWeather(
-                                                  citySearchController.text);
-                                              getCurrentWeatherTime(
-                                                  citySearchController.text);
-                                              getWeatherDays(
-                                                  citySearchController.text);
+                                              _methods.getCurrentWeather(
+                                                  city:
+                                                      citySearchController.text,
+                                                  toSetState: () {
+                                                    setState(() {});
+                                                  });
+                                              _methods.getCurrentWeatherTime(
+                                                  city:
+                                                      citySearchController.text,
+                                                  toSetState: () {
+                                                    setState(() {});
+                                                  });
+                                              _methods.getWeatherDays(
+                                                  city:
+                                                      citySearchController.text,
+                                                  toSetState: () {
+                                                    setState(() {});
+                                                  });
+                                              citySearchController.clear();
                                             });
                                           },
                                           child: const Text(
@@ -177,6 +168,7 @@ class _HomeViewState extends State<HomeView> {
                                         TextButton(
                                           onPressed: () {
                                             Navigator.pop(context);
+                                            citySearchController.clear();
                                           },
                                           child: const Text(
                                             "CANCEL",
@@ -195,7 +187,7 @@ class _HomeViewState extends State<HomeView> {
                           constraints: const BoxConstraints(),
                           padding: EdgeInsets.zero,
                           iconSize: 30.0,
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -205,21 +197,9 @@ class _HomeViewState extends State<HomeView> {
                   Expanded(
                     child: Container(
                       clipBehavior: Clip.antiAlias,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                           gradient: RadialGradient(
-                        colors: [
-                          Color(0xFF343434),
-                          Color(0xFF343434),
-
-                          Color(0xFF343434),
-                          Color(0xFF343434),
-
-                          Color(0xFF343434),
-                          Color(0xFF343434),
-
-                          // Color(0xFF000000),
-                          // Color(0xFF000000)
-                        ],
+                        colors: MyColors.gradientColor,
                       )),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
@@ -228,124 +208,38 @@ class _HomeViewState extends State<HomeView> {
                             const SizedBox(
                               height: 20,
                             ),
-                            Container(
-                              alignment: Alignment.center,
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 90),
-                              padding: const EdgeInsets.symmetric(vertical: 20),
-                              // width: 180,
-                              // height: 40,
-                              constraints: const BoxConstraints(maxWidth: 10),
-                              decoration: BoxDecoration(
-                                boxShadow: const [
-                                  BoxShadow(offset: Offset(2, 2))
-                                ],
-                                borderRadius: BorderRadius.circular(20.0),
-                                color: Colors.grey.withOpacity(0.2),
-                                // Color(0xFF000000).withOpacity(0.6),
-                              ),
-                              child: Text(
-                                DateFormat("EEEE, MMMM dd, yyyy").format(
-                                    DateTime.fromMillisecondsSinceEpoch(
-                                        weatherData["dt"] * 1000)),
-                                // "Monday, May 27, 2022",
-                                style: const TextStyle(
-                                    fontSize: 20.0,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                            Stack(
-                              alignment: Alignment.center,
-                              clipBehavior: Clip.none,
-                              children: [
-                                Positioned(
-                                  // right: 10,
-                                  // left: 10,
-                                  child: Container(
-                                    width: 250,
-                                    height: 250,
-                                    constraints: const BoxConstraints(
-                                        maxWidth: 450.0, maxHeight: 450),
-                                    child: Image.asset(
-                                        "assets/images/thunder_rain.png"),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 30,
-                                  child: Text(
-                                    weatherData["weather"][0]["description"],
-                                    // "Thunder Storm",
-                                    style: const TextStyle(
-                                        fontSize: 30,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        shadows: [
-                                          Shadow(
-                                            offset: Offset(2, 2),
-                                          )
-                                        ]
-                                        // Color(0xFF636364).withOpacity(0.9),
-                                        ),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 40,
-                                  child: Text(
-                                    "${(weatherData["main"]["temp"] - 273).truncate()}°",
-                                    // "38°",
-                                    style: const TextStyle(
-                                        fontSize: 100,
-                                        color: Colors.white,
-                                        shadows: [
-                                          Shadow(
-                                            offset: Offset(2, 2),
-                                          )
-                                        ]
 
-                                        // Color(0xFF636364).withOpacity(0.9),
-                                        ),
-                                  ),
-                                ),
-                              ],
+                            ///Displays the current day in a container.
+                            CurrentDay(
+                              currentDate: DateFormat("EEEE, MMMM dd, yyyy")
+                                  .format(DateTime.fromMillisecondsSinceEpoch(
+                                      _methods.weatherData["dt"] * 1000)),
                             ),
-                            // SizedBox(height: 10.0),
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 30),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 5.0, vertical: 10),
-                              decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  // Color(0xFF000000).withOpacity(0.6),
-                                  // boxShadow: const [BoxShadow(offset: Offset(2, 2))],
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  WeatherSpeed(
-                                      icon: Icons.speed_rounded,
-                                      basicUnit:
-                                          "${(weatherData["wind"]["speed"])}km/h",
-                                      type: "Speed"),
-                                  WeatherSpeed(
-                                      icon: Icons.percent_rounded,
-                                      basicUnit:
-                                          "${(weatherData["main"]["humidity"])}%",
-                                      type: "humidity"),
-                                  WeatherSpeed(
-                                      icon: Icons.bar_chart_rounded,
-                                      basicUnit:
-                                          "${((weatherData["main"]["pressure"]) / 1013 * 760).truncate()}mmhg",
-                                      type: "pressure"),
-                                ],
-                              ),
+
+                            ///Displays the image, current weather description and temperature
+                            CurrentWeatherDetails(
+                              imageUrl: "assets/images/thunder_rain.png",
+                              weatherDescription: _methods
+                                  .weatherData["weather"][0]["description"],
+                              temprature:
+                                  "${(_methods.weatherData["main"]["temp"] - 273).truncate()}°",
                             ),
+
+                            ///Dispalys the speed, humidity and pressure of the current weather
+                            SpeedPressureHumidityContainer(
+                              speed:
+                                  "${(_methods.weatherData["wind"]["speed"])}km/h",
+                              humidity:
+                                  "${(_methods.weatherData["main"]["humidity"])}%",
+                              pressure:
+                                  "${((_methods.weatherData["main"]["pressure"]) / 1013 * 760).truncate()}mmhg",
+                            ),
+
+                            /// Displays, the current weather time intervals and also resposible for the next days when the
+                            /// next 7 days button is clicked.
                             WeatherCards(
-                              timeList: weatherDataTime,
-                              daysList: weatherDataDays,
+                              timeList: _methods.weatherDataTime,
+                              daysList: _methods.weatherDataDays,
                             ),
                           ],
                         ),
