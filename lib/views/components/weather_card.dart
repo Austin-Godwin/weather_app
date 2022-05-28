@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tomel_weather_app/views/components/time_card.dart';
@@ -7,15 +9,17 @@ class WeatherCards extends StatelessWidget {
   final List<Map<String, dynamic>> timeList;
   final List<Map<String, dynamic>> daysList;
   // final Function()? onTap;
-  const WeatherCards({
+  WeatherCards({
     Key? key,
     required this.timeList,
     required this.daysList,
     // required this.onTap,
   }) : super(key: key);
-
+  String currentTime = DateFormat("h:mm a").format(DateTime.now());
   @override
   Widget build(BuildContext context) {
+    int currentIndex = 0;
+    String currentTime = DateFormat("h:mm a").format(DateTime.now());
     // padding: EdgeInsets.symmetric(horizontal: 30),
     return Column(
       children: [
@@ -94,7 +98,18 @@ class WeatherCards extends StatelessWidget {
                 ...List.generate(
                     (timeList.length / 5).floor(),
                     (index) => TimeCard(
+                        cardColor:
+                            // currentTime ==
+                            //         DateFormat("h:mm a").format(
+                            //             DateTime.fromMillisecondsSinceEpoch(
+                            //                 timeList[index]["dt"] * 1000))
+                            //     ? Colors.amber.withOpacity(0.2)
+                            //     : Colors.grey.withOpacity(0.2),
+                            currentIndex == index
+                                ? Colors.amber.withOpacity(0.2)
+                                : Colors.grey.withOpacity(0.2),
                         // onTap: onTap,
+                        imageUrl: "${timeList[index]["weather"][0]["main"]}",
                         temperature:
                             "${((timeList[index]["main"]["temp"]) - 273).truncate()}°",
                         time: DateFormat("h:mm a").format(

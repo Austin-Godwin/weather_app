@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:tomel_weather_app/views/components/weather_image.dart';
 
 class TimeCard extends StatelessWidget {
   final String temperature;
   final String time;
+  final Color? cardColor;
+  final String imageUrl;
   // final Function()? onTap;
   const TimeCard({
     Key? key,
     required this.temperature,
     required this.time,
+    this.cardColor,
+    required this.imageUrl,
     // required this.onTap,
   }) : super(key: key);
 
@@ -24,7 +29,7 @@ class TimeCard extends StatelessWidget {
           margin: const EdgeInsets.only(left: 15.0),
           decoration: BoxDecoration(
               boxShadow: const [BoxShadow(offset: Offset(2, 2))],
-              color: Colors.grey.withOpacity(0.2),
+              color: cardColor,
               borderRadius: BorderRadius.circular(20)),
           child: Column(
             children: [
@@ -40,12 +45,13 @@ class TimeCard extends StatelessWidget {
               const SizedBox(
                 height: 10,
               ),
-              SizedBox(
-                height: 40,
-                width: 40,
-                // decoration: BoxDecoration(),
-                child: Image.asset("assets/images/rain_sun.png"),
-              ),
+              SmallWeatherImage(weatherCondition: imageUrl),
+              // SizedBox(
+              //   height: 40,
+              //   width: 40,
+              //   // decoration: BoxDecoration(),
+              //   child: Image.asset("assets/images/rain_sun.png"),
+              // ),
 
               Text(
                 time,

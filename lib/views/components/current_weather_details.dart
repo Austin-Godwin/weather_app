@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tomel_weather_app/views/components/weather_image.dart';
 
 class CurrentWeatherDetails extends StatelessWidget {
   final String imageUrl;
@@ -18,15 +19,16 @@ class CurrentWeatherDetails extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         Positioned(
-          // right: 10,
-          // left: 10,
-          child: Container(
-            width: 250,
-            height: 250,
-            constraints: const BoxConstraints(maxWidth: 450.0, maxHeight: 450),
-            child: Image.asset(imageUrl),
-          ),
-        ),
+            // right: 10,
+            // left: 10,
+            child: LargeWeatherImage(weatherCondition: imageUrl)
+            // Container(
+            //   width: 250,
+            //   height: 250,
+            //   constraints: const BoxConstraints(maxWidth: 450.0, maxHeight: 450),
+            //   child: Image.asset(imageUrl),
+            // ),
+            ),
         Positioned(
           top: 30,
           child: Text(

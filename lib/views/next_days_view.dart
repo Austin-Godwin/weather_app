@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tomel_weather_app/constant/colors.dart';
+import 'package:tomel_weather_app/views/components/weather_image.dart';
 import 'components/weather_speed.dart';
 
 class NextDaysView extends StatelessWidget {
@@ -10,6 +11,7 @@ class NextDaysView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const int currentIndex = 1;
     return Scaffold(
       backgroundColor: const Color(0xFF343434),
       // backgroundColor: Color(0xFFF0E7FE),
@@ -86,14 +88,18 @@ class NextDaysView extends StatelessWidget {
                           children: [
                             Stack(
                               children: [
-                                Container(
-                                  width: 150,
-                                  height: 150,
-                                  constraints: const BoxConstraints(
-                                      maxWidth: 450.0, maxHeight: 450),
-                                  child: Image.asset(
-                                      "assets/images/thunder_rain.png"),
+                                MediumWeatherImage(
+                                  weatherCondition:
+                                      "${list[1]["weather"][0]["main"]}",
                                 ),
+                                // Container(
+                                //   width: 150,
+                                //   height: 150,
+                                //   constraints: const BoxConstraints(
+                                //       maxWidth: 450.0, maxHeight: 450),
+                                //   child: Image.asset(
+                                //       "assets/images/thunder_rain.png"),
+                                // ),
 
                                 //     Text(
                                 //   _methods.weatherData["name"],
@@ -205,7 +211,9 @@ class NextDaysView extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 15.0, vertical: 20),
                                 decoration: BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.2),
+                                    color: currentIndex == index
+                                        ? Colors.amber.withOpacity(0.2)
+                                        : Colors.grey.withOpacity(0.2),
                                     // Color(0xFF000000).withOpacity(0.6),
                                     boxShadow: const [
                                       BoxShadow(offset: Offset(2, 2))
@@ -243,12 +251,15 @@ class NextDaysView extends StatelessWidget {
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          SizedBox(
-                                            height: 40,
-                                            width: 40,
-                                            child: Image.asset(
-                                                "assets/images/rain_sun.png"),
-                                          ),
+                                          SmallWeatherImage(
+                                              weatherCondition:
+                                                  "${list[index]["weather"][0]["main"]}"),
+                                          // SizedBox(
+                                          //   height: 40,
+                                          //   width: 40,
+                                          //   child: Image.asset(
+                                          //       "assets/images/rain_sun.png"),
+                                          // ),
                                           const SizedBox(
                                             width: 10.0,
                                           ),

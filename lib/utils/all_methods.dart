@@ -57,4 +57,6 @@ class AllMethods {
     //  isLoading = false;
     toSetState();
   }
+
+  
 }

@@ -5,7 +5,6 @@ import 'package:tomel_weather_app/constant/colors.dart';
 import 'package:tomel_weather_app/utils/all_methods.dart';
 import 'package:tomel_weather_app/views/components/current_day.dart';
 import 'package:tomel_weather_app/views/components/current_weather_details.dart';
-import 'package:tomel_weather_app/views/components/search_dialog.dart';
 import 'package:tomel_weather_app/views/components/speed_pressure_humidity_container.dart';
 import 'package:tomel_weather_app/views/components/weather_card.dart';
 
@@ -218,7 +217,9 @@ class _HomeViewState extends State<HomeView> {
 
                             ///Displays the image, current weather description and temperature
                             CurrentWeatherDetails(
-                              imageUrl: "assets/images/thunder_rain.png",
+                              imageUrl: _methods.weatherData["weather"][0]
+                                  ["main"],
+                              // "assets/images/thunder_rain.png",
                               weatherDescription: _methods
                                   .weatherData["weather"][0]["description"],
                               temprature:
